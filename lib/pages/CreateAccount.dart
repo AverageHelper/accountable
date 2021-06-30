@@ -1,8 +1,9 @@
 import 'package:accountable/model/StandardColor.dart';
 import 'package:accountable/extensions/String.dart';
+import 'package:accountable/utilities/CheckboxFormField.dart';
 import 'package:flutter/material.dart';
 
-/// A dialog that requests metadata about an account.
+/// A page that requests metadata about a new account.
 class CreateAccountPage extends StatefulWidget {
   CreateAccountPage(this.onFinished, {Key? key}) : super(key: key);
 
@@ -11,6 +12,7 @@ class CreateAccountPage extends StatefulWidget {
     required String title,
     required String notes,
     required StandardColor color,
+    required bool shouldCloseAccountsWhenFinished,
   }) onFinished;
 
   @override
@@ -22,10 +24,11 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   final TextEditingController nameFieldController = TextEditingController();
   final TextEditingController notesFieldController = TextEditingController();
   StandardColor selectedColor = randomColor();
+  bool shouldCloseAccountsWhenFinished = true;
 
   bool canCreateAccount = false;
 
-  void onTextFieldChanged(String s) {
+  void onTextFieldChanged(String _) {
     checkCanCreateAccount();
   }
 
@@ -37,6 +40,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     checkCanCreateAccount();
   }
 
+  void onChecboxChanged(bool? value) {
+    setState(() {
+      this.shouldCloseAccountsWhenFinished =
+          value ?? this.shouldCloseAccountsWhenFinished;
+    });
+  }
+
   void checkCanCreateAccount() {
     setState(() {
       // validate parameters
@@ -46,10 +56,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
   void commitForm() {
     this.widget.onFinished(
-          title: this.nameFieldController.text,
-          notes: this.notesFieldController.text,
-          color: this.selectedColor,
-        );
+        title: this.nameFieldController.text,
+        notes: this.notesFieldController.text,
+        color: this.selectedColor,
+        shouldCloseAccountsWhenFinished: this.shouldCloseAccountsWhenFinished);
   }
 
   Widget colorDropdownItem(StandardColor color) {
@@ -145,6 +155,16 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   onChanged: onTextFieldChanged,
                   maxLines: null,
                 ),
+
+                // Wanna add transactions right away?
+                CheckboxFormField(
+                  title: Text("Open when finished"),
+                  subtitle: Text(this.shouldCloseAccountsWhenFinished
+                      ? "We will open this account after it's created"
+                      : "We will return to the accounts list"),
+                  value: shouldCloseAccountsWhenFinished,
+                  onChanged: onChecboxChanged,
+                )
               ],
             ),
           ),
