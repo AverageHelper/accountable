@@ -12,8 +12,8 @@ class TransactionRecord with DataModel<TransactionRecord> {
   final String? notes;
   final String? categoryId;
   final bool isReconciled;
-  final Money amount;
-  final Money balanceRemaining;
+  final Money amountEarned;
+  final Money accountBalanceAfterThis;
   final DateTime createdAt;
 
   TransactionRecord._({
@@ -24,8 +24,8 @@ class TransactionRecord with DataModel<TransactionRecord> {
     required this.notes,
     required this.categoryId,
     required this.isReconciled,
-    required this.amount,
-    required this.balanceRemaining,
+    required this.amountEarned,
+    required this.accountBalanceAfterThis,
     required this.createdAt,
   });
 
@@ -37,8 +37,8 @@ class TransactionRecord with DataModel<TransactionRecord> {
     String? notes,
     String? categoryId,
     bool? isReconciled,
-    required Money amount,
-    required Money balanceRemaining,
+    required Money amountEarned,
+    required Money accountBalanceAfterThis,
     DateTime? createdAt,
   }) {
     return TransactionRecord._(
@@ -50,8 +50,8 @@ class TransactionRecord with DataModel<TransactionRecord> {
       categoryId: categoryId,
       isReconciled: isReconciled ?? false,
       createdAt: createdAt ?? DateTime.now(),
-      amount: amount,
-      balanceRemaining: balanceRemaining,
+      amountEarned: amountEarned,
+      accountBalanceAfterThis: accountBalanceAfterThis,
     );
   }
 }

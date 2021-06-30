@@ -25,8 +25,8 @@ class _AccountsListPageState extends State<AccountsList> {
 
   @override
   dispose() {
-    super.dispose();
     this.stopListening();
+    super.dispose();
   }
 
   void stopListening() {
@@ -114,7 +114,19 @@ class _AccountsListPageState extends State<AccountsList> {
 
   Widget emptyState() {
     return Center(
-      child: Text("Press + to create an account"),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.account_balance,
+            size: 100,
+          ),
+          Container(
+            margin: const EdgeInsets.all(16),
+            child: const Text("Press + to create an account"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -129,11 +141,11 @@ class _AccountsListPageState extends State<AccountsList> {
         onRefresh: refreshList,
         child: this.loadedAccounts == null
             ? loadingState()
-            : this.loadedAccounts!.length == 0
+            : this.loadedAccounts!.isEmpty == true
                 ? emptyState()
                 : ListView.builder(
                     itemCount: this.loadedAccounts!.length,
-                    itemBuilder: (context, idx) =>
+                    itemBuilder: (_, idx) =>
                         moneyListItem(this.loadedAccounts![idx]),
                   ),
       ),

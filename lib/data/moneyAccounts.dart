@@ -24,6 +24,9 @@ VoidCallback watchMoneyAccountsForUser(Function(Map<String, MoneyAccount>) cb) {
   };
 }
 
+/// Caches and returns the money account with the given ID.
+/// Also starts watching the account for changes. The
+/// cached copy will be updated accordingly.
 VoidCallback watchMoneyAccountWithId(
   String id,
   Function(MoneyAccount?) cb,
@@ -52,8 +55,8 @@ Future<MoneyAccount> createMoneyAccount({
   );
 
   // TODO: Talk to the server instead; let the watchers handle updating the cache and listeners
-  loadedAccounts!.putIfAbsent(newAccount.id, () => newAccount);
-  accountSubscribers.forEach((cb) => cb(loadedAccounts!));
+  loadedAccounts?.putIfAbsent(newAccount.id, () => newAccount);
+  accountSubscribers.forEach((cb) => cb(loadedAccounts ?? {}));
   singleAccountSubscribers.forEach((id, cb) {
     if (id == newAccount.id) {
       cb(newAccount);

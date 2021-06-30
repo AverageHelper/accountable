@@ -3,6 +3,7 @@ import 'package:accountable/data/transactionRecords.dart';
 import 'package:accountable/model/MoneyAccount.dart';
 import 'package:accountable/model/StandardColor.dart';
 import 'package:accountable/model/TransactionRecord.dart';
+import 'package:accountable/pages/CreateTransaction.dart';
 import 'package:flutter/material.dart';
 
 /// A page that displays an account's data
@@ -30,8 +31,8 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
 
   @override
   dispose() {
-    super.dispose();
     this.stopListening();
+    super.dispose();
   }
 
   void stopListening() {
@@ -73,11 +74,16 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
   }
 
   Future<dynamic> displayDialog(BuildContext context) async {
-    // Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (_) => new CreateTransactionPage(createTransaction),
-    //   ),
-    // );
+    if (this.account == null) {
+      return;
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) =>
+            new CreateTransactionPage(this.account!, createTransactionRecord),
+      ),
+    );
   }
 
   void displayTransactionDetails(String transactionId) {
@@ -96,6 +102,12 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
       leading: Icon(
         Icons.circle,
         // color: account.color.primaryColor,
+      ),
+      trailing: Text(
+        transaction.amountEarned.toString(),
+        style: transaction.amountEarned.isPositive
+            ? null // default
+            : new TextStyle(color: Colors.red),
       ),
       onTap: () => displayTransactionDetails(transaction.id),
     );
@@ -118,7 +130,19 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
 
   Widget emptyState() {
     return Center(
-      child: Text("Press + to create a transaction"),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.attach_money,
+            size: 100,
+          ),
+          Container(
+            margin: const EdgeInsets.all(16),
+            child: const Text("Press + to create a transaction"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -144,13 +168,12 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
           onRefresh: refreshList,
           child: this.account == null || this.loadedTransactions == null
               ? loadingState()
-              : this.loadedTransactions?.length == 0
+              : this.loadedTransactions?.isEmpty == true
                   ? emptyState()
                   : ListView.builder(
                       itemCount: this.loadedTransactions!.length,
-                      itemBuilder: (context, idx) => ListTile(
-                        title: Text(this.loadedTransactions![idx].title),
-                      ),
+                      itemBuilder: (_, idx) =>
+                          transactionListItem(this.loadedTransactions![idx]),
                     ),
         ),
         floatingActionButton: this.loadedTransactions == null

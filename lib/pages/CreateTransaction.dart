@@ -1,22 +1,31 @@
+import 'package:accountable/model/MoneyAccount.dart';
 import 'package:accountable/model/StandardColor.dart';
 import 'package:accountable/extensions/String.dart';
 import 'package:accountable/utilities/CheckboxFormField.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
+import 'package:money2/money2.dart';
 
-/// A page that requests metadata about a new account.
-class CreateAccountPage extends StatefulWidget {
-  CreateAccountPage(this.onFinished, {Key? key}) : super(key: key);
+/// A page that requests metadata about a new transaction.
+class CreateTransactionPage extends StatefulWidget {
+  CreateTransactionPage(this.account, this.onFinished, {Key? key})
+      : super(key: key);
 
-  /// A function that `CreateAccountPage` calls when the user commits the form.
+  /// The account which owns the transaction.
+  final MoneyAccount account;
+
+  /// A function that `CreateTransactionPage` calls when the user commits the form.
   final void Function({
+    required MoneyAccount account,
     required String title,
     required String notes,
-    required StandardColor color,
-    required bool shouldCloseAccountsWhenFinished,
+    required bool isReconciled,
+    required DateTime transactionTime,
+    required Money amountEarned,
   }) onFinished;
 
   @override
-  _CreateAccountPageState createState() => _CreateAccountPageState();
+  _CreateTransactionPageState createState() => _CreateTransactionPageState();
 }
 
 Widget colorDropdownItem(StandardColor color) {
@@ -36,46 +45,57 @@ Widget colorDropdownItem(StandardColor color) {
   );
 }
 
-class _CreateAccountPageState extends State<CreateAccountPage> {
+class _CreateTransactionPageState extends State<CreateTransactionPage> {
   final GlobalKey<FormState> _formKey = GlobalKey();
   final TextEditingController _nameFieldController = TextEditingController();
   final TextEditingController _notesFieldController = TextEditingController();
-  StandardColor _selectedColor = randomColor();
-  bool _shouldCloseAccountsWhenFinished = true;
+  bool _isReconciled = false;
+  DateTime _transactionTime = DateTime.now();
+  Currency _currency = Currency.create('USD', 2);
+  late Money _amountEarned = Money.from(-0, _currency);
 
-  bool _canCommitAccount = false;
+  bool get _isIncome {
+    return this._amountEarned.isPositive;
+  }
+
+  bool _canCommitTransaction = false;
 
   void _commitForm() {
     this.widget.onFinished(
-        title: this._nameFieldController.text,
-        notes: this._notesFieldController.text,
-        color: this._selectedColor,
-        shouldCloseAccountsWhenFinished: this._shouldCloseAccountsWhenFinished);
+          account: this.widget.account,
+          title: this._nameFieldController.text,
+          notes: this._notesFieldController.text,
+          isReconciled: this._isReconciled,
+          transactionTime: this._transactionTime,
+          amountEarned: this._amountEarned,
+        );
   }
 
   void _onTextFieldChanged(String _) {
     _checkCanCommitAccount();
   }
 
-  void _onColorChanged(StandardColor? value) {
-    final StandardColor color = value ?? randomColor();
+  void _onAmountFieldChanged(String amt) {
     setState(() {
-      this._selectedColor = color;
+      try {
+        this._amountEarned = Money.parse(amt, _currency);
+      } catch (e) {
+        this._amountEarned = Money.from(0, _currency);
+      }
     });
     _checkCanCommitAccount();
   }
 
   void _onChecboxChanged(bool? value) {
     setState(() {
-      this._shouldCloseAccountsWhenFinished =
-          value ?? this._shouldCloseAccountsWhenFinished;
+      this._isReconciled = value ?? this._isReconciled;
     });
   }
 
   void _checkCanCommitAccount() {
     setState(() {
       // validate parameters
-      this._canCommitAccount = _nameFieldController.text.isNotEmpty;
+      this._canCommitTransaction = _nameFieldController.text.isNotEmpty;
     });
   }
 
@@ -84,11 +104,11 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     return Theme(
       data: ThemeData(
         brightness: Theme.of(context).brightness,
-        primarySwatch: this._selectedColor.materialColor,
+        primarySwatch: this._isIncome ? Colors.green : Colors.red,
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Add an account"),
+          title: const Text("Add a transaction"),
           leading: IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {
@@ -98,7 +118,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.check),
-              onPressed: this._canCommitAccount
+              onPressed: this._canCommitTransaction
                   ? () {
                       Navigator.of(context).pop();
                       this._commitForm();
@@ -113,22 +133,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: <Widget>[
-                // Color
-                DropdownButtonFormField(
-                  value: this._selectedColor,
-                  onChanged: _onColorChanged,
-                  decoration: const InputDecoration(
-                    hintText: "Color",
-                    icon: const Icon(Icons.color_lens),
-                  ),
-                  items: StandardColor.values
-                      .map((c) => DropdownMenuItem(
-                            child: colorDropdownItem(c),
-                            value: c,
-                          ))
-                      .toList(),
-                ),
-
                 // Title
                 TextFormField(
                   controller: this._nameFieldController,
@@ -155,15 +159,30 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   maxLines: null,
                 ),
 
-                // Wanna add transactions right away?
+                // Amount
+                TextFormField(
+                  onChanged: _onAmountFieldChanged,
+                  inputFormatters: [
+                    CurrencyTextInputFormatter(
+                      symbol: this._currency.symbol,
+                      decimalDigits: this._currency.precision,
+                    )
+                  ],
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    hintText: "\$0.00",
+                    icon: const Icon(Icons.attach_money),
+                  ),
+                ),
+
+                // Reconciliation
                 CheckboxFormField(
-                  title: Text("Open when finished"),
-                  subtitle: Text(this._shouldCloseAccountsWhenFinished
-                      ? "We will open this account after it's created"
-                      : "We will return to the accounts list"),
-                  value: _shouldCloseAccountsWhenFinished,
+                  title: Text("Reconciled"),
+                  value: _isReconciled,
                   onChanged: _onChecboxChanged,
-                )
+                ),
+
+                // Time
               ],
             ),
           ),

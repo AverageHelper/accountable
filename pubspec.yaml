@@ -31,6 +31,7 @@ dependencies:
   flutter_data: ^0.8.0
   uuid: ^3.0.4
   money2: ^2.2.1
+  currency_text_input_formatter: ^2.0.1
 
 dev_dependencies:
   flutter_test:
