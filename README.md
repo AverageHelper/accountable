@@ -1,6 +1,6 @@
-# accountable
+# Accountable
 
-A new Flutter project.
+A Flutter app for managing monetary assets.
 
 ## Getting Started
 
