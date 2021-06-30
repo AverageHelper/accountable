@@ -1,6 +1,7 @@
+import 'package:accountable/data/moneyAccounts.dart';
+import 'package:accountable/model/MoneyAccount.dart';
+import 'package:accountable/utilities/CreateAccountDialog.dart';
 import 'package:flutter/material.dart';
-import './utilities/CreateAccountDialog.dart';
-import './model/MoneyAccount.dart';
 
 void main() {
   runApp(App());
@@ -37,24 +38,39 @@ class AccountsList extends StatefulWidget {
 
 class _AccountsListPageState extends State<AccountsList> {
   GlobalKey<RefreshIndicatorState> refreshKey = GlobalKey();
-  List<MoneyAccount> loadedAccounts = [];
+  List<MoneyAccount>? loadedAccounts;
+  VoidCallback? unsubscribeAccounts;
+
+  @override
+  initState() {
+    super.initState();
+    this.refreshList();
+  }
+
+  @override
+  dispose() {
+    super.dispose();
+    if (this.unsubscribeAccounts != null) {
+      this.unsubscribeAccounts!();
+      this.unsubscribeAccounts = null;
+    }
+  }
 
   Future<Null> refreshList() async {
     setState(() {
-      loadedAccounts.clear();
+      this.loadedAccounts = null;
     });
-  }
 
-  void createAccount({
-    required String title,
-    required String notes,
-  }) {
-    setState(() {
-      MoneyAccount acct = new MoneyAccount(null);
-      acct.title = title;
-      acct.notes = notes;
-
-      this.loadedAccounts.add(acct);
+    if (unsubscribeAccounts != null) {
+      unsubscribeAccounts!();
+      unsubscribeAccounts = null;
+    }
+    unsubscribeAccounts = watchMoneyAccountsForUser((accounts) {
+      List<MoneyAccount> sorted = accounts.values.toList();
+      sorted.sort((a, b) => a.title.compareTo(b.title));
+      setState(() {
+        this.loadedAccounts = sorted;
+      });
     });
   }
 
@@ -62,14 +78,29 @@ class _AccountsListPageState extends State<AccountsList> {
     return showDialog(
         context: context,
         builder: (BuildContext context) {
-          return new CreateAccountDialog(this.createAccount);
+          return new CreateAccountDialog(createMoneyAccount);
         });
   }
 
   Widget moneyListItem(MoneyAccount account) {
     return ListTile(
       title: Text(account.title),
-      subtitle: account.notes.isNotEmpty ? Text(account.notes) : null,
+      subtitle: account.notes != null ? Text(account.notes!) : null,
+    );
+  }
+
+  Widget loadingState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          CircularProgressIndicator.adaptive(),
+          Container(
+            margin: EdgeInsets.all(8),
+            child: Text("Loading Accounts..."),
+          ),
+        ],
+      ),
     );
   }
 
@@ -82,17 +113,21 @@ class _AccountsListPageState extends State<AccountsList> {
       body: RefreshIndicator(
         key: refreshKey,
         onRefresh: refreshList,
-        child: ListView.builder(
-          itemBuilder: (context, idx) =>
-              moneyListItem(this.loadedAccounts[idx]),
-          itemCount: this.loadedAccounts.length,
-        ),
+        child: this.loadedAccounts == null
+            ? loadingState()
+            : ListView.builder(
+                itemCount: this.loadedAccounts!.length,
+                itemBuilder: (context, idx) =>
+                    moneyListItem(this.loadedAccounts![idx]),
+              ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => displayDialog(context),
-        tooltip: 'Add an Account',
-        child: Icon(Icons.add),
-      ),
+      floatingActionButton: this.loadedAccounts == null
+          ? null
+          : FloatingActionButton(
+              onPressed: () => displayDialog(context),
+              tooltip: 'Add an Account',
+              child: Icon(Icons.add),
+            ),
     );
   }
 }

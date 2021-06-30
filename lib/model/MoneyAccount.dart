@@ -1,15 +1,32 @@
+import 'package:accountable/model/Color.dart';
+import 'package:accountable/model/UUID.dart';
 import 'package:flutter_data/flutter_data.dart';
-import 'package:uuid/uuid.dart';
-
-var uuid = Uuid();
 
 class MoneyAccount with DataModel<MoneyAccount> {
   @override
   final String id;
-  String title;
-  String notes;
-  String color;
+  final Color color;
+  final String title;
+  final String? notes;
 
-  MoneyAccount(String? id, {this.title = "", this.notes = "", this.color = ""})
-      : id = id ?? uuid.v4();
+  MoneyAccount._({
+    required this.id,
+    required this.color,
+    required this.title,
+    this.notes,
+  });
+
+  factory MoneyAccount({
+    String? id,
+    Color? color,
+    required String title,
+    String? notes,
+  }) {
+    return MoneyAccount._(
+      title: title,
+      notes: notes?.isNotEmpty == true ? notes : null,
+      id: id ?? uuid(),
+      color: color ?? randomColor(),
+    );
+  }
 }
