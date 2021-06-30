@@ -1,4 +1,5 @@
 import 'package:accountable/model/MoneyAccount.dart';
+import 'package:accountable/model/StandardColor.dart';
 import 'package:flutter/material.dart';
 
 Map<String, MoneyAccount>? loadedAccounts;
@@ -26,10 +27,12 @@ VoidCallback watchMoneyAccountsForUser(Function(Map<String, MoneyAccount>) cb) {
 Future<MoneyAccount> createMoneyAccount({
   required String title,
   required String? notes,
+  required StandardColor? color,
 }) async {
   MoneyAccount newAccount = new MoneyAccount(
     title: title,
     notes: notes,
+    color: color,
   );
 
   // TODO: Talk to the server instead; let the watcher handle updating the cache

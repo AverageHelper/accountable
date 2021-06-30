@@ -1,11 +1,11 @@
-import 'package:accountable/model/Color.dart';
+import 'package:accountable/model/StandardColor.dart';
 import 'package:accountable/model/UUID.dart';
 import 'package:flutter_data/flutter_data.dart';
 
 class MoneyAccount with DataModel<MoneyAccount> {
   @override
   final String id;
-  final Color color;
+  final StandardColor color;
   final String title;
   final String? notes;
 
@@ -18,7 +18,7 @@ class MoneyAccount with DataModel<MoneyAccount> {
 
   factory MoneyAccount({
     String? id,
-    Color? color,
+    StandardColor? color,
     required String title,
     String? notes,
   }) {

@@ -1,5 +1,6 @@
 import 'package:accountable/data/moneyAccounts.dart';
 import 'package:accountable/model/MoneyAccount.dart';
+import 'package:accountable/model/StandardColor.dart';
 import 'package:accountable/pages/CreateAccount.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,11 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'accountable',
       theme: ThemeData(
+        brightness: Brightness.light,
+        primarySwatch: Colors.green,
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
         primarySwatch: Colors.green,
       ),
       home: AccountsList(),
@@ -86,6 +92,10 @@ class _AccountsListPageState extends State<AccountsList> {
     return ListTile(
       title: Text(account.title),
       subtitle: account.notes != null ? Text(account.notes!) : null,
+      leading: Icon(
+        Icons.circle,
+        color: account.color.primaryColor,
+      ),
     );
   }
 
