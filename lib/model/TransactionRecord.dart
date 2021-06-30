@@ -15,8 +15,6 @@ class TransactionRecord with DataModel<TransactionRecord> {
   final Money amount;
   final Money balanceRemaining;
   final DateTime createdAt;
-  final int month;
-  final int year;
 
   TransactionRecord._({
     required this.id,
@@ -29,8 +27,6 @@ class TransactionRecord with DataModel<TransactionRecord> {
     required this.amount,
     required this.balanceRemaining,
     required this.createdAt,
-    required this.month,
-    required this.year,
   });
 
   factory TransactionRecord({
@@ -45,8 +41,6 @@ class TransactionRecord with DataModel<TransactionRecord> {
     required Money balanceRemaining,
     DateTime? createdAt,
   }) {
-    DateTime date = createdAt ?? DateTime.now();
-
     return TransactionRecord._(
       id: id ?? uuid(),
       accountId: accountId,
@@ -55,9 +49,7 @@ class TransactionRecord with DataModel<TransactionRecord> {
       notes: notes?.isNotEmpty == true ? notes : null,
       categoryId: categoryId,
       isReconciled: isReconciled ?? false,
-      createdAt: date,
-      month: date.month,
-      year: date.year,
+      createdAt: createdAt ?? DateTime.now(),
       amount: amount,
       balanceRemaining: balanceRemaining,
     );
