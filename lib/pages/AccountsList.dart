@@ -112,6 +112,12 @@ class _AccountsListPageState extends State<AccountsList> {
     );
   }
 
+  Widget emptyState() {
+    return Center(
+      child: Text("Press + to create an account"),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,11 +129,13 @@ class _AccountsListPageState extends State<AccountsList> {
         onRefresh: refreshList,
         child: this.loadedAccounts == null
             ? loadingState()
-            : ListView.builder(
-                itemCount: this.loadedAccounts!.length,
-                itemBuilder: (context, idx) =>
-                    moneyListItem(this.loadedAccounts![idx]),
-              ),
+            : this.loadedAccounts!.length == 0
+                ? emptyState()
+                : ListView.builder(
+                    itemCount: this.loadedAccounts!.length,
+                    itemBuilder: (context, idx) =>
+                        moneyListItem(this.loadedAccounts![idx]),
+                  ),
       ),
       floatingActionButton: this.loadedAccounts == null
           ? null

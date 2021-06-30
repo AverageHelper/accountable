@@ -13,7 +13,7 @@ Map<String, Function(MoneyAccount?)> singleAccountSubscribers = {};
 VoidCallback watchMoneyAccountsForUser(Function(Map<String, MoneyAccount>) cb) {
   // TODO: Call onSnapshot instead; call cb with new sorted data
   if (loadedAccounts == null) {
-    loadedAccounts = new Map();
+    loadedAccounts = {};
   }
 
   accountSubscribers.add(cb);
@@ -24,7 +24,10 @@ VoidCallback watchMoneyAccountsForUser(Function(Map<String, MoneyAccount>) cb) {
   };
 }
 
-VoidCallback watchMoneyAccountWithId(String id, Function(MoneyAccount?) cb) {
+VoidCallback watchMoneyAccountWithId(
+  String id,
+  Function(MoneyAccount?) cb,
+) {
   // TODO: Call onSnapshot instead; call cb with new data
   MoneyAccount? account = loadedAccounts?[id];
 

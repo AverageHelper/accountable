@@ -19,65 +19,64 @@ class CreateAccountPage extends StatefulWidget {
   _CreateAccountPageState createState() => _CreateAccountPageState();
 }
 
+Widget colorDropdownItem(StandardColor color) {
+  String title = color.name.capitalized();
+
+  return Row(
+    children: [
+      Icon(
+        Icons.circle,
+        color: color.primaryColor,
+      ),
+      Container(
+        margin: const EdgeInsets.only(left: 8),
+        child: Text(title),
+      ),
+    ],
+  );
+}
+
 class _CreateAccountPageState extends State<CreateAccountPage> {
   final GlobalKey<FormState> _formKey = GlobalKey();
-  final TextEditingController nameFieldController = TextEditingController();
-  final TextEditingController notesFieldController = TextEditingController();
-  StandardColor selectedColor = randomColor();
-  bool shouldCloseAccountsWhenFinished = true;
+  final TextEditingController _nameFieldController = TextEditingController();
+  final TextEditingController _notesFieldController = TextEditingController();
+  StandardColor _selectedColor = randomColor();
+  bool _shouldCloseAccountsWhenFinished = true;
 
-  bool canCreateAccount = false;
+  bool _canCommitAccount = false;
 
-  void onTextFieldChanged(String _) {
-    checkCanCreateAccount();
+  void _commitForm() {
+    this.widget.onFinished(
+        title: this._nameFieldController.text,
+        notes: this._notesFieldController.text,
+        color: this._selectedColor,
+        shouldCloseAccountsWhenFinished: this._shouldCloseAccountsWhenFinished);
   }
 
-  void onColorChanged(StandardColor? value) {
+  void _onTextFieldChanged(String _) {
+    _checkCanCommitAccount();
+  }
+
+  void _onColorChanged(StandardColor? value) {
     final StandardColor color = value ?? randomColor();
     setState(() {
-      this.selectedColor = color;
+      this._selectedColor = color;
     });
-    checkCanCreateAccount();
+    _checkCanCommitAccount();
   }
 
-  void onChecboxChanged(bool? value) {
+  void _onChecboxChanged(bool? value) {
     setState(() {
-      this.shouldCloseAccountsWhenFinished =
-          value ?? this.shouldCloseAccountsWhenFinished;
+      this._shouldCloseAccountsWhenFinished =
+          value ?? this._shouldCloseAccountsWhenFinished;
     });
   }
 
-  void checkCanCreateAccount() {
+  void _checkCanCommitAccount() {
     setState(() {
       // validate parameters
-      this.canCreateAccount = nameFieldController.text.isNotEmpty;
+      this._canCommitAccount = _nameFieldController.text.isNotEmpty;
     });
-  }
-
-  void commitForm() {
-    this.widget.onFinished(
-        title: this.nameFieldController.text,
-        notes: this.notesFieldController.text,
-        color: this.selectedColor,
-        shouldCloseAccountsWhenFinished: this.shouldCloseAccountsWhenFinished);
-  }
-
-  Widget colorDropdownItem(StandardColor color) {
-    String title = color.name.capitalized();
-
-    // return Text(title);
-    return Row(
-      children: [
-        Icon(
-          Icons.circle,
-          color: color.primaryColor,
-        ),
-        Container(
-          margin: EdgeInsets.only(left: 8),
-          child: Text(title),
-        ),
-      ],
-    );
   }
 
   @override
@@ -85,7 +84,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     return Theme(
       data: ThemeData(
         brightness: Theme.of(context).brightness,
-        primarySwatch: this.selectedColor.materialColor,
+        primarySwatch: this._selectedColor.materialColor,
       ),
       child: Scaffold(
         appBar: AppBar(
@@ -99,10 +98,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.check),
-              onPressed: this.canCreateAccount
+              onPressed: this._canCommitAccount
                   ? () {
                       Navigator.of(context).pop();
-                      this.commitForm();
+                      this._commitForm();
                     }
                   : null,
             ),
@@ -120,8 +119,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     hintText: "Color",
                     icon: const Icon(Icons.color_lens),
                   ),
-                  value: this.selectedColor,
-                  onChanged: onColorChanged,
+                  value: this._selectedColor,
+                  onChanged: _onColorChanged,
                   items: StandardColor.values
                       .map((c) => DropdownMenuItem(
                             child: colorDropdownItem(c),
@@ -132,7 +131,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
                 // Title
                 TextFormField(
-                  controller: this.nameFieldController,
+                  controller: this._nameFieldController,
                   decoration: const InputDecoration(
                     hintText: "Title",
                     icon: const Icon(
@@ -140,30 +139,30 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     ),
                   ),
                   textCapitalization: TextCapitalization.words,
-                  onChanged: onTextFieldChanged,
+                  onChanged: _onTextFieldChanged,
                   autofocus: true,
                 ),
 
                 // Notes
                 TextFormField(
-                  controller: this.notesFieldController,
+                  controller: this._notesFieldController,
                   decoration: const InputDecoration(
                     hintText: "Notes",
                     icon: const Icon(Icons.notes),
                   ),
                   textCapitalization: TextCapitalization.sentences,
-                  onChanged: onTextFieldChanged,
+                  onChanged: _onTextFieldChanged,
                   maxLines: null,
                 ),
 
                 // Wanna add transactions right away?
                 CheckboxFormField(
                   title: Text("Open when finished"),
-                  subtitle: Text(this.shouldCloseAccountsWhenFinished
+                  subtitle: Text(this._shouldCloseAccountsWhenFinished
                       ? "We will open this account after it's created"
                       : "We will return to the accounts list"),
-                  value: shouldCloseAccountsWhenFinished,
-                  onChanged: onChecboxChanged,
+                  value: _shouldCloseAccountsWhenFinished,
+                  onChanged: _onChecboxChanged,
                 )
               ],
             ),
