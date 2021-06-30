@@ -1,6 +1,6 @@
 import 'package:accountable/data/moneyAccounts.dart';
 import 'package:accountable/model/MoneyAccount.dart';
-import 'package:accountable/utilities/CreateAccountDialog.dart';
+import 'package:accountable/pages/CreateAccount.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -75,11 +75,11 @@ class _AccountsListPageState extends State<AccountsList> {
   }
 
   Future<dynamic> displayDialog(BuildContext context) async {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return new CreateAccountDialog(createMoneyAccount);
-        });
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => new CreateAccountPage(createMoneyAccount),
+      ),
+    );
   }
 
   Widget moneyListItem(MoneyAccount account) {
@@ -94,10 +94,10 @@ class _AccountsListPageState extends State<AccountsList> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          CircularProgressIndicator.adaptive(),
+          const CircularProgressIndicator.adaptive(),
           Container(
-            margin: EdgeInsets.all(8),
-            child: Text("Loading Accounts..."),
+            margin: const EdgeInsets.all(8),
+            child: const Text("Loading Accounts..."),
           ),
         ],
       ),
@@ -108,7 +108,7 @@ class _AccountsListPageState extends State<AccountsList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Accounts"),
+        title: const Text("Accounts"),
       ),
       body: RefreshIndicator(
         key: refreshKey,
@@ -126,7 +126,7 @@ class _AccountsListPageState extends State<AccountsList> {
           : FloatingActionButton(
               onPressed: () => displayDialog(context),
               tooltip: 'Add an Account',
-              child: Icon(Icons.add),
+              child: const Icon(Icons.add),
             ),
     );
   }
