@@ -1,6 +1,7 @@
+import 'package:accountable/extensions/StandardColor.dart';
+import 'package:accountable/extensions/String.dart';
 import 'package:accountable/model/MoneyAccount.dart';
 import 'package:accountable/model/StandardColor.dart';
-import 'package:accountable/extensions/String.dart';
 import 'package:accountable/utilities/CheckboxFormField.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';

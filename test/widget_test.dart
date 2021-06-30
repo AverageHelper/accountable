@@ -11,20 +11,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:accountable/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('Account creator appears', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp());
+    await tester.pumpWidget(App());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verify that our Creator view is not open.
+    expect(find.text('Press + to create an account'), findsOneWidget);
+    expect(find.text('Add an account'), findsNothing);
 
     // Tap the '+' icon and trigger a frame.
     await tester.tap(find.byIcon(Icons.add));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify that our Creator view has appeared.
+    expect(find.text('Add an account'), findsNothing);
   });
 }

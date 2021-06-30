@@ -1,7 +1,8 @@
 import 'package:accountable/data/moneyAccounts.dart';
+import 'package:accountable/extensions/StandardColor.dart';
 import 'package:accountable/model/MoneyAccount.dart';
-import 'package:accountable/pages/CreateAccount.dart';
 import 'package:accountable/model/StandardColor.dart';
+import 'package:accountable/pages/CreateAccount.dart';
 import 'package:accountable/pages/ViewAccount.dart';
 import 'package:flutter/material.dart';
 
