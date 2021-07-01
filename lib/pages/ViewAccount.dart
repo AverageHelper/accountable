@@ -47,7 +47,7 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
     }
   }
 
-  Future<Null> refreshList() async {
+  Future<void> refreshList() async {
     setState(() {
       this.loadedTransactions = null;
       this.account = null;
@@ -66,7 +66,7 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
       this.widget.accountId,
       (transactions) {
         List<TransactionRecord> sorted = transactions.values.toList();
-        sorted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        sorted.sort((a, b) => b.createdAt.compareTo(b.createdAt));
         setState(() {
           this.loadedTransactions = sorted;
         });

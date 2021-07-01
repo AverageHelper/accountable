@@ -37,7 +37,7 @@ class _AccountsListPageState extends State<AccountsList> {
     }
   }
 
-  Future<Null> refreshList() async {
+  Future<void> refreshList() async {
     setState(() {
       this.loadedAccounts = null;
     });
@@ -52,7 +52,7 @@ class _AccountsListPageState extends State<AccountsList> {
     });
   }
 
-  Future<Null> onFinishedCreatingAccount({
+  Future<void> onFinishedCreatingAccount({
     required String title,
     required String notes,
     required StandardColor color,

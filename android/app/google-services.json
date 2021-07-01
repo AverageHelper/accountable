@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "670019445985",
+    "project_id": "accountable-bc972",
+    "storage_bucket": "accountable-bc972.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670019445985:android:80d5fa703219874c9fc3a0",
+        "android_client_info": {
+          "package_name": "com.example.accountable"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "670019445985-al84q7n0qin9k6kjh94sebkjuk9kj26l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDZBL8MUfl93LVJl1098yivEq72C0DHYM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "670019445985-al84q7n0qin9k6kjh94sebkjuk9kj26l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "670019445985-eeb4ok205ip02h3a049kg4j6ocf9g2ta.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.accountable"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
