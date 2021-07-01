@@ -4,6 +4,7 @@ import 'package:accountable/extensions/StandardColor.dart';
 import 'package:accountable/model/MoneyAccount.dart';
 import 'package:accountable/model/TransactionRecord.dart';
 import 'package:accountable/pages/CreateTransaction.dart';
+import 'package:accountable/utilities/LoadingScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -126,18 +127,7 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
   }
 
   Widget loadingState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          const CircularProgressIndicator.adaptive(),
-          Container(
-            margin: const EdgeInsets.all(8),
-            child: const Text("Loading Account..."),
-          ),
-        ],
-      ),
-    );
+    return LoadingScreen("Loading Account...");
   }
 
   Widget emptyState() {

@@ -4,6 +4,7 @@ import 'package:accountable/model/MoneyAccount.dart';
 import 'package:accountable/model/StandardColor.dart';
 import 'package:accountable/pages/CreateAccount.dart';
 import 'package:accountable/pages/ViewAccount.dart';
+import 'package:accountable/utilities/LoadingScreen.dart';
 import 'package:flutter/material.dart';
 
 class AccountsList extends StatefulWidget {
@@ -99,18 +100,7 @@ class _AccountsListPageState extends State<AccountsList> {
   }
 
   Widget loadingState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          const CircularProgressIndicator.adaptive(),
-          Container(
-            margin: const EdgeInsets.all(8),
-            child: const Text("Loading Accounts..."),
-          ),
-        ],
-      ),
-    );
+    return LoadingScreen("Loading Accounts...");
   }
 
   Widget emptyState() {

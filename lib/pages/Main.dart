@@ -1,4 +1,5 @@
-import 'package:accountable/pages/Login.dart';
+import 'package:accountable/pages/LoginOrRegister.dart';
+import 'package:accountable/utilities/LoadingScreen.dart';
 import 'package:flutter/material.dart';
 
 class Main extends StatelessWidget {
@@ -22,20 +23,11 @@ class Main extends StatelessWidget {
 
           // Loaded!
           if (snapshot.connectionState == ConnectionState.done) {
-            return Login();
+            return LoginOrRegister();
           }
 
           // Still loading...
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text("Initializing Firebase..."),
-              ],
-            ),
-          );
+          return LoadingScreen("Initializing backend service...");
         },
       ),
     );
