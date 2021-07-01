@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 Map<String, MoneyAccount>? loadedAccounts;
 
-List<Function(Map<String, MoneyAccount>)> accountSubscribers = [];
-Map<String, Function(MoneyAccount?)> singleAccountSubscribers = {};
+final List<Function(Map<String, MoneyAccount>)> accountSubscribers = [];
+final Map<String, Function(MoneyAccount?)> singleAccountSubscribers = {};
 
 /// Caches and returns all of the user's known money accounts.
 /// Also starts watching the user's accounts for changes. The

@@ -1,4 +1,4 @@
-import 'package:accountable/pages/AccountsList.dart';
+import 'package:accountable/pages/Main.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -18,7 +18,7 @@ class App extends StatelessWidget {
         brightness: Brightness.dark,
         primarySwatch: Colors.green,
       ),
-      home: AccountsList(),
+      home: Main(),
     );
   }
 }

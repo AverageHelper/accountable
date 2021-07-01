@@ -5,7 +5,7 @@ import 'package:money2/money2.dart';
 
 Map<String, Map<String, TransactionRecord>>? loadedTransactionsForAccounts;
 
-Map<String, List<Function(Map<String, TransactionRecord>)>>
+final Map<String, List<Function(Map<String, TransactionRecord>)>>
     accountTransactionSubscribers = {};
 
 /// Caches and returns all of the user's transactions associated
