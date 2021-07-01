@@ -2,9 +2,11 @@ import 'package:accountable/extensions/StandardColor.dart';
 import 'package:accountable/extensions/String.dart';
 import 'package:accountable/model/MoneyAccount.dart';
 import 'package:accountable/model/StandardColor.dart';
+import 'package:accountable/utilities/AlwaysDisabledFocusNode.dart';
 import 'package:accountable/utilities/CheckboxFormField.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:money2/money2.dart';
 
 /// A page that requests metadata about a new transaction.
@@ -61,6 +63,16 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
 
   bool _canCommitTransaction = false;
 
+  String get _formattedDate {
+    final DateFormat formatter = DateFormat.yMMMMd();
+    return formatter.format(_transactionTime);
+  }
+
+  String get _formattedTime {
+    final DateFormat formatter = DateFormat.jm();
+    return formatter.format(_transactionTime);
+  }
+
   void _commitForm() {
     this.widget.onFinished(
           account: this.widget.account,
@@ -97,6 +109,37 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
     setState(() {
       // validate parameters
       this._canCommitTransaction = _nameFieldController.text.isNotEmpty;
+    });
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _transactionTime,
+      firstDate: new DateTime(1901),
+      lastDate: new DateTime(DateTime.now().year + 1000),
+    );
+
+    setState(() {
+      this._transactionTime = pickedDate ?? this._transactionTime;
+    });
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(_transactionTime),
+    );
+    final DateTime newDate = new DateTime(
+      _transactionTime.year,
+      _transactionTime.month,
+      _transactionTime.day,
+      pickedTime?.hour ?? _transactionTime.hour,
+      pickedTime?.minute ?? _transactionTime.minute,
+    );
+
+    setState(() {
+      this._transactionTime = newDate;
     });
   }
 
@@ -145,7 +188,7 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
                     ),
                   ),
                   textCapitalization: TextCapitalization.words,
-                  autofocus: true,
+                  // autofocus: true,
                 ),
 
                 // Notes
@@ -176,14 +219,45 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
                   ),
                 ),
 
+                // Date & Time
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    // Date
+                    Expanded(
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          hintText: _formattedDate,
+                          icon: const Icon(Icons.calendar_today),
+                        ),
+                        onTap: () => _selectDate(context),
+                        focusNode: new AlwaysDisabledFocusNode(),
+                      ),
+                    ),
+
+                    // Spacer(),
+                    SizedBox(width: 24),
+
+                    // Time
+                    Expanded(
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          hintText: _formattedTime,
+                          icon: const Icon(Icons.access_time),
+                        ),
+                        onTap: () => _selectTime(context),
+                        focusNode: new AlwaysDisabledFocusNode(),
+                      ),
+                    ),
+                  ],
+                ),
+
                 // Reconciliation
                 CheckboxFormField(
                   title: Text("Reconciled"),
                   value: _isReconciled,
                   onChanged: _onChecboxChanged,
                 ),
-
-                // Time
               ],
             ),
           ),

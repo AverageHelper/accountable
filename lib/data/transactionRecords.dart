@@ -35,7 +35,7 @@ VoidCallback watchTransactionsForAccountWithId(
 Future<TransactionRecord> createTransactionRecord({
   required MoneyAccount account,
   required String title,
-  required String notes,
+  required String? notes,
   required bool isReconciled,
   required DateTime transactionTime,
   required Money amountEarned,
@@ -49,8 +49,8 @@ Future<TransactionRecord> createTransactionRecord({
   Money zero = Money.from(0, amountEarned.currency);
   debugPrint("Creating transaction...");
   TransactionRecord newRecord = new TransactionRecord(
-    title: title,
-    notes: notes,
+    title: title.trim(),
+    notes: notes?.trim(),
     isReconciled: isReconciled,
     createdAt: transactionTime,
     amountEarned: amountEarned,

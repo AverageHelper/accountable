@@ -5,6 +5,7 @@ import 'package:accountable/model/MoneyAccount.dart';
 import 'package:accountable/model/TransactionRecord.dart';
 import 'package:accountable/pages/CreateTransaction.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 /// A page that displays an account's data
 class ViewAccountPage extends StatefulWidget {
@@ -65,7 +66,7 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
       this.widget.accountId,
       (transactions) {
         List<TransactionRecord> sorted = transactions.values.toList();
-        sorted.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+        sorted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         setState(() {
           this.loadedTransactions = sorted;
         });
@@ -96,9 +97,20 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
   }
 
   Widget transactionListItem(TransactionRecord transaction) {
+    final DateFormat formatter = DateFormat.yMMMMd().add_jm();
+    final String createdAt = formatter.format(transaction.createdAt);
+
     return ListTile(
       title: Text(transaction.title),
-      subtitle: transaction.notes != null ? Text(transaction.notes!) : null,
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          transaction.notes != null
+              ? Text(transaction.notes!)
+              : SizedBox.shrink(),
+          Text(createdAt),
+        ],
+      ),
       leading: Icon(
         Icons.circle,
         // color: account.color.primaryColor,

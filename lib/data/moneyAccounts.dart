@@ -49,8 +49,8 @@ Future<MoneyAccount> createMoneyAccount({
   required StandardColor? color,
 }) async {
   MoneyAccount newAccount = new MoneyAccount(
-    title: title,
-    notes: notes,
+    title: title.trim(),
+    notes: notes?.trim(),
     color: color,
   );
 
