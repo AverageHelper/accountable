@@ -108,7 +108,7 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
         children: <Widget>[
           transaction.notes != null
               ? Text(transaction.notes!)
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
           Text(createdAt),
         ],
       ),
@@ -120,7 +120,7 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
         transaction.amountEarned.toString(),
         style: transaction.amountEarned.isPositive
             ? null // default
-            : new TextStyle(color: Colors.red),
+            : const TextStyle(color: Colors.red),
       ),
       onTap: () => displayTransactionDetails(transaction.id),
     );

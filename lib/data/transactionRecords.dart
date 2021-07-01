@@ -20,7 +20,7 @@ VoidCallback watchTransactionsForAccountWithId(
     loadedTransactionsForAccounts = {};
   }
 
-  var subs = accountTransactionSubscribers[id] ?? [];
+  final subs = accountTransactionSubscribers[id] ?? [];
   subs.add(cb);
   accountTransactionSubscribers[id] = subs;
 
@@ -40,7 +40,7 @@ Future<TransactionRecord> createTransactionRecord({
   required DateTime transactionTime,
   required Money amountEarned,
 }) async {
-  var accountTransactions =
+  final accountTransactions =
       loadedTransactionsForAccounts?[account.id]?.values.toList() ?? [];
   accountTransactions.sort((a, b) => a.createdAt.compareTo(b.createdAt));
   TransactionRecord? lastRecord =
@@ -58,7 +58,7 @@ Future<TransactionRecord> createTransactionRecord({
     accountBalanceAfterThis:
         (lastRecord?.accountBalanceAfterThis ?? zero) + amountEarned,
   );
-  var amt = amountEarned.toString();
+  final amt = amountEarned.toString();
   debugPrint("Created $amt transaction named $title");
 
   // TODO: Talk to the server instead; let the watchers handle updating the cache and listeners

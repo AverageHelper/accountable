@@ -1,3 +1,4 @@
+import 'package:accountable/data/backend/Keys.dart';
 import 'package:accountable/data/backend/auth.dart';
 import 'package:accountable/pages/AccountsList.dart';
 import 'package:accountable/pages/Login.dart';
@@ -5,7 +6,9 @@ import 'package:accountable/utilities/LoadingScreen.dart';
 import 'package:flutter/material.dart';
 
 class LoginOrRegister extends StatefulWidget {
-  LoginOrRegister({Key? key}) : super(key: key);
+  LoginOrRegister(this.keys, {Key? key}) : super(key: key);
+
+  final Keys keys;
 
   @override
   _LoginOrRegisterState createState() => _LoginOrRegisterState();
@@ -49,7 +52,7 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
     if (isLoggedIn == false) {
       switch (view) {
         case _View.login:
-          return Login();
+          return Login(widget.keys, tryLogin: logIn);
 
         case _View.register:
           return Text("You need to register");

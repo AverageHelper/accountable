@@ -236,7 +236,7 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
                     ),
 
                     // Spacer(),
-                    SizedBox(width: 24),
+                    const SizedBox(width: 24),
 
                     // Time
                     Expanded(
