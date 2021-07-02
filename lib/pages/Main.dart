@@ -1,5 +1,5 @@
 import 'package:accountable/data/backend/Keys.dart';
-import 'package:accountable/pages/LoginOrRegister.dart';
+import 'package:accountable/pages/ObtainCredentials.dart';
 import 'package:accountable/utilities/LoadingScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -63,7 +63,7 @@ class Main extends StatelessWidget {
                   "Missing value(s) for environment keys 'PARSE_APP_ID' and 'PARSE_CLIENT_KEY'. Add them in .env");
             }
 
-            return LoginOrRegister(snapshot.data!);
+            return ObtainCredentials(snapshot.data!);
           }
 
           // Still loading...
