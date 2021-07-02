@@ -39,12 +39,14 @@ class _LoginState extends State<LoginOrRegister> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _repeatPasswordController =
+      TextEditingController();
 
   String? error;
   bool canCommitLogin = false;
   bool isCommittingLogin = false;
   bool showsAdvancedOptions = false;
-  bool isRegisteringNewAccount = true;
+  bool isRegisteringNewAccount = false;
 
   @override
   void initState() {
@@ -57,7 +59,10 @@ class _LoginState extends State<LoginOrRegister> {
       this.error = null;
       this.canCommitLogin = _usernameController.text.trim().isNotEmpty &&
           _passwordController.text.isNotEmpty &&
-          (!isRegisteringNewAccount || _emailController.text.trim().isNotEmpty);
+          (!isRegisteringNewAccount ||
+              (_emailController.text.trim().isNotEmpty &&
+                  _repeatPasswordController.text.isNotEmpty &&
+                  _passwordController.text == _repeatPasswordController.text));
     });
   }
 
@@ -70,6 +75,7 @@ class _LoginState extends State<LoginOrRegister> {
   void toggleRegistrationView() {
     setState(() {
       this._emailController.clear();
+      this._repeatPasswordController.clear();
       this.isRegisteringNewAccount = !this.isRegisteringNewAccount;
     });
     checkCanCommitLogin("");
@@ -125,7 +131,7 @@ class _LoginState extends State<LoginOrRegister> {
     }
   }
 
-  Widget urlField() {
+  Widget urlField(FocusScopeNode node) {
     return TextFormField(
       controller: _urlController,
       onChanged: checkCanCommitLogin,
@@ -142,29 +148,39 @@ class _LoginState extends State<LoginOrRegister> {
     );
   }
 
-  Widget emailField() {
+  Widget emailField(FocusScopeNode node) {
     return TextFormField(
       controller: _emailController,
       onChanged: checkCanCommitLogin,
       keyboardType: TextInputType.emailAddress,
       textCapitalization: TextCapitalization.none,
       autocorrect: false,
+      autofillHints: [AutofillHints.email],
+      textInputAction: TextInputAction.next,
+      onEditingComplete: () => node.nextFocus(),
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.black),
         ),
-        labelText: "Email Address",
+        labelText: "Email address",
       ),
     );
   }
 
-  Widget usernameField() {
+  Widget usernameField(FocusScopeNode node) {
     return TextFormField(
       controller: _usernameController,
       onChanged: checkCanCommitLogin,
       keyboardType: TextInputType.text,
       textCapitalization: TextCapitalization.none,
       autocorrect: false,
+      autofillHints: [
+        isRegisteringNewAccount
+            ? AutofillHints.newUsername
+            : AutofillHints.username
+      ],
+      textInputAction: TextInputAction.next,
+      onEditingComplete: () => node.nextFocus(),
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.black),
@@ -174,7 +190,7 @@ class _LoginState extends State<LoginOrRegister> {
     );
   }
 
-  Widget passwordField() {
+  Widget passwordField(FocusScopeNode node) {
     return TextFormField(
       controller: _passwordController,
       onChanged: checkCanCommitLogin,
@@ -182,11 +198,37 @@ class _LoginState extends State<LoginOrRegister> {
       keyboardType: TextInputType.text,
       textCapitalization: TextCapitalization.none,
       autocorrect: false,
+      autofillHints: [
+        isRegisteringNewAccount
+            ? AutofillHints.newPassword
+            : AutofillHints.password
+      ],
+      textInputAction: isRegisteringNewAccount ? TextInputAction.next : null,
+      onEditingComplete:
+          isRegisteringNewAccount ? () => node.nextFocus() : null,
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderSide: const BorderSide(color: Colors.black),
         ),
         labelText: "Password",
+      ),
+    );
+  }
+
+  Widget repeatPasswordField(FocusScopeNode node) {
+    return TextFormField(
+      controller: _repeatPasswordController,
+      onChanged: checkCanCommitLogin,
+      obscureText: true,
+      keyboardType: TextInputType.text,
+      textCapitalization: TextCapitalization.none,
+      autocorrect: false,
+      autofillHints: [AutofillHints.newPassword],
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.black),
+        ),
+        labelText: "Repeat password",
       ),
     );
   }
@@ -263,38 +305,42 @@ class _LoginState extends State<LoginOrRegister> {
     );
   }
 
-  Widget form() {
+  Widget form(BuildContext context) {
+    final FocusScopeNode node = FocusScope.of(context);
     return Container(
       // color: Colors.lightGreen,
-      child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              // Fields
-              if (isRegisteringNewAccount) emailField(),
-              usernameField(),
-              passwordField(),
-              if (error != null) errorView(),
+      child: AutofillGroup(
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                // Fields
+                if (isRegisteringNewAccount) emailField(node),
+                usernameField(node),
+                passwordField(node),
+                if (isRegisteringNewAccount) repeatPasswordField(node),
+                if (error != null) errorView(),
 
-              // Advanced
-              advancedToggleButton(),
-              if (showsAdvancedOptions) urlField(),
+                // Advanced
+                advancedToggleButton(),
+                if (showsAdvancedOptions) urlField(node),
 
-              // Buttons
-              submitButton(),
-              toggleViewButton(),
-            ]
-                .map(
-                  (e) => Padding(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 4,
-                      horizontal: 16,
+                // Buttons
+                submitButton(),
+                toggleViewButton(),
+              ]
+                  .map(
+                    (e) => Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 16,
+                      ),
+                      child: e,
                     ),
-                    child: e,
-                  ),
-                )
-                .toList(),
+                  )
+                  .toList(),
+            ),
           ),
         ),
       ),
@@ -314,7 +360,7 @@ class _LoginState extends State<LoginOrRegister> {
             ),
             Expanded(
               flex: 2,
-              child: form(),
+              child: form(context),
             ),
           ],
         ),
