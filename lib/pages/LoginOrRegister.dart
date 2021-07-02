@@ -125,146 +125,198 @@ class _LoginState extends State<LoginOrRegister> {
     }
   }
 
+  Widget urlField() {
+    return TextFormField(
+      controller: _urlController,
+      onChanged: checkCanCommitLogin,
+      keyboardType: TextInputType.url,
+      textCapitalization: TextCapitalization.none,
+      autocorrect: false,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.black),
+        ),
+        labelText: "Server URL",
+        hintText: parseServerUrl,
+      ),
+    );
+  }
+
+  Widget emailField() {
+    return TextFormField(
+      controller: _emailController,
+      onChanged: checkCanCommitLogin,
+      keyboardType: TextInputType.emailAddress,
+      textCapitalization: TextCapitalization.none,
+      autocorrect: false,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.black),
+        ),
+        labelText: "Email Address",
+      ),
+    );
+  }
+
+  Widget usernameField() {
+    return TextFormField(
+      controller: _usernameController,
+      onChanged: checkCanCommitLogin,
+      keyboardType: TextInputType.text,
+      textCapitalization: TextCapitalization.none,
+      autocorrect: false,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.black),
+        ),
+        labelText: "Username",
+      ),
+    );
+  }
+
+  Widget passwordField() {
+    return TextFormField(
+      controller: _passwordController,
+      onChanged: checkCanCommitLogin,
+      obscureText: true,
+      keyboardType: TextInputType.text,
+      textCapitalization: TextCapitalization.none,
+      autocorrect: false,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.black),
+        ),
+        labelText: "Password",
+      ),
+    );
+  }
+
+  Widget errorView() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16),
+      alignment: Alignment.centerLeft,
+      child: Text(
+        error ?? "",
+        style: TextStyle(color: Colors.red),
+      ),
+    );
+  }
+
+  Widget advancedToggleButton() {
+    return TextButton(
+      child: Row(
+        children: <Widget>[
+          Icon(showsAdvancedOptions
+              ? Icons.arrow_drop_up
+              : Icons.arrow_drop_down),
+          const Text('Advanced'),
+        ],
+      ),
+      onPressed: toggleAdvanced,
+    );
+  }
+
+  Widget submitButton() {
+    return TextButton(
+      child: isCommittingLogin
+          ? const CircularProgressIndicator()
+          : Text(isRegisteringNewAccount ? 'Register' : 'Log In'),
+      onPressed: canCommitLogin ? commitForm : null,
+      // style: ButtonStyle(alignment: Alignment.centerRight),
+    );
+  }
+
+  Widget toggleViewButton() {
+    return TextButton(
+      child: Text(
+        isRegisteringNewAccount ? 'Log into existing' : 'Create a new account',
+      ),
+      onPressed: toggleRegistrationView,
+      // style: ButtonStyle(alignment: Alignment.centerRight),
+    );
+  }
+
+  Widget branding() {
+    return Container(
+      // color: Colors.blueGrey,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              "Accountable",
+              style: TextStyle(
+                fontSize: 42,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              isRegisteringNewAccount
+                  ? 'Create an account'
+                  : 'Log into your account',
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget form() {
+    return Container(
+      // color: Colors.lightGreen,
+      child: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              // Fields
+              if (isRegisteringNewAccount) emailField(),
+              usernameField(),
+              passwordField(),
+              if (error != null) errorView(),
+
+              // Advanced
+              advancedToggleButton(),
+              if (showsAdvancedOptions) urlField(),
+
+              // Buttons
+              submitButton(),
+              toggleViewButton(),
+            ]
+                .map(
+                  (e) => Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 4,
+                      horizontal: 16,
+                    ),
+                    child: e,
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Form(
-        key: _formKey,
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                // Branding
-                Center(
-                  child: Text(
-                    "Accountable",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // ** Prompt
-                Center(
-                  child: Text(
-                    isRegisteringNewAccount
-                        ? 'User Registration'
-                        : 'User Login',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Email
-                if (isRegisteringNewAccount)
-                  TextFormField(
-                    controller: _emailController,
-                    onChanged: checkCanCommitLogin,
-                    keyboardType: TextInputType.emailAddress,
-                    textCapitalization: TextCapitalization.none,
-                    autocorrect: false,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.black),
-                      ),
-                      labelText: "Email Address",
-                    ),
-                  ),
-                if (isRegisteringNewAccount) const SizedBox(height: 8),
-
-                // Username
-                TextFormField(
-                  controller: _usernameController,
-                  onChanged: checkCanCommitLogin,
-                  keyboardType: TextInputType.text,
-                  textCapitalization: TextCapitalization.none,
-                  autocorrect: false,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderSide: const BorderSide(color: Colors.black),
-                    ),
-                    labelText: "Username",
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Password
-                TextFormField(
-                  controller: _passwordController,
-                  onChanged: checkCanCommitLogin,
-                  obscureText: true,
-                  keyboardType: TextInputType.text,
-                  textCapitalization: TextCapitalization.none,
-                  autocorrect: false,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderSide: const BorderSide(color: Colors.black),
-                    ),
-                    labelText: "Password",
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                if (error != null)
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      error!,
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-
-                // ** Advanced options
-                TextButton(
-                  child: Row(
-                    children: <Widget>[
-                      Icon(showsAdvancedOptions
-                          ? Icons.arrow_drop_up
-                          : Icons.arrow_drop_down),
-                      const Text('Advanced'),
-                    ],
-                  ),
-                  onPressed: toggleAdvanced,
-                ),
-
-                // Server URL
-                if (showsAdvancedOptions)
-                  TextFormField(
-                    controller: _urlController,
-                    onChanged: checkCanCommitLogin,
-                    keyboardType: TextInputType.url,
-                    textCapitalization: TextCapitalization.none,
-                    autocorrect: false,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.black),
-                      ),
-                      labelText: "Server URL",
-                      hintText: parseServerUrl,
-                    ),
-                  ),
-                if (showsAdvancedOptions) const SizedBox(height: 8),
-
-                // ** Submit
-                TextButton(
-                  child: isCommittingLogin
-                      ? const CircularProgressIndicator()
-                      : Text(isRegisteringNewAccount ? 'Register' : 'Log In'),
-                  onPressed: canCommitLogin ? commitForm : null,
-                ),
-                TextButton(
-                  child: Text(isRegisteringNewAccount
-                      ? 'Log into existing'
-                      : 'Create a new account'),
-                  onPressed: toggleRegistrationView,
-                ),
-              ],
+      body: SafeArea(
+        child: Flex(
+          direction: Axis.vertical,
+          children: <Widget>[
+            Flexible(
+              fit: FlexFit.tight,
+              child: branding(),
             ),
-          ),
+            Expanded(
+              flex: 2,
+              child: form(),
+            ),
+          ],
         ),
       ),
     );
