@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:670019445985:android:80d5fa703219874c9fc3a0",
         "android_client_info": {
-          "package_name": "com.example.accountable"
+          "package_name": "io.github.averagehelper.accountable"
         }
       },
       "oauth_client": [
@@ -34,7 +34,7 @@
               "client_id": "670019445985-eeb4ok205ip02h3a049kg4j6ocf9g2ta.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.accountable"
+                "bundle_id": "io.github.averagehelper.accountable"
               }
             }
           ]

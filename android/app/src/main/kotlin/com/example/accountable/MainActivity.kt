@@ -1,4 +1,4 @@
-package com.example.accountable
+package io.github.averagehelper.accountable
 
 import io.flutter.embedding.android.FlutterActivity
 
