@@ -1,4 +1,4 @@
-import 'package:accountable/data/backend/Keys.dart';
+import 'package:accountable/model/Keys.dart';
 import 'package:accountable/data/backend/auth.dart';
 import 'package:accountable/pages/AccountsList.dart';
 import 'package:accountable/pages/LoginOrRegister.dart';

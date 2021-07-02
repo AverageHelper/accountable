@@ -1,4 +1,4 @@
-import 'package:accountable/data/backend/Keys.dart';
+import 'package:accountable/model/Keys.dart';
 import 'package:accountable/pages/ObtainCredentials.dart';
 import 'package:accountable/utilities/LoadingScreen.dart';
 import 'package:flutter/material.dart';

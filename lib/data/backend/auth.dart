@@ -1,10 +1,14 @@
-import 'package:accountable/data/backend/Keys.dart';
+import 'package:accountable/model/Keys.dart';
 import 'package:flutter/material.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk.dart';
 
 final List<Function(bool)> authStateListeners = [];
 
 ParseUser? loggedInUser;
+
+ParseUser? currentUser() {
+  return loggedInUser;
+}
 
 /// Monitors the current login state and calls a callback
 /// when it changes. The callback receives a `bool` that

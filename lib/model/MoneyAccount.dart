@@ -29,4 +29,13 @@ class MoneyAccount with DataModel<MoneyAccount> {
       color: color ?? randomColor(),
     );
   }
+
+  MoneyAccount withId(String id) {
+    return new MoneyAccount(
+      id: id,
+      color: this.color,
+      title: this.title,
+      notes: this.notes,
+    );
+  }
 }
