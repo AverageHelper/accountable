@@ -32,7 +32,8 @@ class LoginOrRegister extends StatefulWidget {
 }
 
 class _LoginState extends State<LoginOrRegister> {
-  final String parseServerUrl = "https://parseapi.back4app.com";
+  final String parseServerUrl =
+      "https://accountable.b4a.io"; // "https://parseapi.back4app.com";
 
   final GlobalKey<FormState> _formKey = GlobalKey();
   final TextEditingController _urlController = TextEditingController();

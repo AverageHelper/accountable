@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class Main extends StatelessWidget {
-  // final String parseServerUrl = "https://parseapi.back4app.com";
-
   final Future<Keys?> _environment = dotenv.load(fileName: ".env").then(
     (_) {
       final String? appId = dotenv.env["PARSE_APP_ID"];
@@ -19,19 +17,6 @@ class Main extends StatelessWidget {
       );
     },
   );
-
-  // late final Future<Parse> _backend = _environment.then((keys) {
-  //   if (keys == null)
-  //     throw new Exception(
-  //         "Missing value(s) for environment keys 'PARSE_APP_ID' and 'PARSE_CLIENT_KEY'. Add them in .env");
-  //   return Parse().initialize(
-  //     keys.appId,
-  //     parseServerUrl,
-  //     clientKey: keys.clientKey,
-  //     autoSendSessionId: true,
-  //     debug: true,
-  //   );
-  // });
 
   Widget errorState(String error) {
     return Center(
@@ -50,7 +35,6 @@ class Main extends StatelessWidget {
     return Scaffold(
       body: FutureBuilder(
         future: _environment,
-        // future: _backend,
         builder: (_, AsyncSnapshot<Keys?> snapshot) {
           if (snapshot.hasError) {
             return errorState(snapshot.error.toString());

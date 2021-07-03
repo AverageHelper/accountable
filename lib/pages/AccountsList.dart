@@ -44,7 +44,7 @@ class _AccountsListPageState extends State<AccountsList> {
     });
 
     this.stopListening();
-    unsubscribeAccounts = watchMoneyAccountsForUser((accounts) {
+    unsubscribeAccounts = await watchMoneyAccountsForUser((accounts) {
       List<MoneyAccount> sorted = accounts.values.toList();
       sorted.sort((a, b) => a.title.compareTo(b.title));
       setState(() {

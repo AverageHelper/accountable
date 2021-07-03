@@ -55,7 +55,7 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
     });
 
     this.stopListening();
-    unsubscribeAccount = watchMoneyAccountWithId(
+    unsubscribeAccount = await watchMoneyAccountWithId(
       this.widget.accountId,
       (MoneyAccount? account) {
         setState(() {

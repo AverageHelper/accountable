@@ -28,9 +28,14 @@ Future<void> logIn({
   required String username,
   required String password,
 }) async {
+  final String defaultUrl =
+      "https://accountable.b4a.io"; // "https://parseapi.back4app.com";
+
   await Parse().initialize(
     keys.appId,
     url,
+    // FIXME: This may cause issues
+    liveQueryUrl: url == defaultUrl ? "wss://accountable.b4a.io" : null,
     clientKey: keys.clientKey,
     autoSendSessionId: true,
   );
