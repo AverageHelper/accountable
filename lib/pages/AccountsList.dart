@@ -66,7 +66,7 @@ class _AccountsListPageState extends State<AccountsList> {
     );
 
     if (shouldCloseAccountsWhenFinished) {
-      displayAccountDetails(newAccount.id);
+      displayAccountDetails(newAccount);
     }
   }
 
@@ -78,11 +78,11 @@ class _AccountsListPageState extends State<AccountsList> {
     );
   }
 
-  void displayAccountDetails(String accountId) {
+  void displayAccountDetails(MoneyAccount account) {
     // Navigate to this account's page
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => new ViewAccountPage(accountId),
+        builder: (_) => new ViewAccountPage(account),
       ),
     );
   }
@@ -95,7 +95,7 @@ class _AccountsListPageState extends State<AccountsList> {
         Icons.circle,
         color: account.color.primaryColor,
       ),
-      onTap: () => displayAccountDetails(account.id),
+      onTap: () => displayAccountDetails(account),
     );
   }
 

@@ -1,3 +1,4 @@
+import 'package:accountable/model/MoneyAccount.dart';
 import 'package:accountable/model/StandardColor.dart';
 import 'package:accountable/model/UUID.dart';
 import 'package:flutter_data/flutter_data.dart';
@@ -6,7 +7,7 @@ import 'package:money2/money2.dart';
 class TransactionRecord with DataModel<TransactionRecord> {
   @override
   final String id;
-  final String accountId;
+  final MoneyAccount account;
   final StandardColor color;
   final String title;
   final String? notes;
@@ -18,7 +19,7 @@ class TransactionRecord with DataModel<TransactionRecord> {
 
   TransactionRecord._({
     required this.id,
-    required this.accountId,
+    required this.account,
     required this.color,
     required this.title,
     required this.notes,
@@ -31,7 +32,7 @@ class TransactionRecord with DataModel<TransactionRecord> {
 
   factory TransactionRecord({
     String? id,
-    required String accountId,
+    required MoneyAccount account,
     StandardColor? color,
     required String title,
     String? notes,
@@ -43,7 +44,7 @@ class TransactionRecord with DataModel<TransactionRecord> {
   }) {
     return TransactionRecord._(
       id: id ?? uuid(),
-      accountId: accountId,
+      account: account,
       color: color ?? randomColor(),
       title: title,
       notes: notes?.isNotEmpty == true ? notes : null,
@@ -52,6 +53,21 @@ class TransactionRecord with DataModel<TransactionRecord> {
       createdAt: createdAt ?? DateTime.now(),
       amountEarned: amountEarned,
       accountBalanceAfterThis: accountBalanceAfterThis,
+    );
+  }
+
+  TransactionRecord withId(String id) {
+    return new TransactionRecord(
+      id: id,
+      account: this.account,
+      color: this.color,
+      title: this.title,
+      notes: this.notes,
+      categoryId: this.categoryId,
+      isReconciled: this.isReconciled,
+      amountEarned: this.amountEarned,
+      accountBalanceAfterThis: this.accountBalanceAfterThis,
+      createdAt: this.createdAt,
     );
   }
 }

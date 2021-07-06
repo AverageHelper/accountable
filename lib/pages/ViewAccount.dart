@@ -2,6 +2,7 @@ import 'package:accountable/data/moneyAccounts.dart';
 import 'package:accountable/data/transactionRecords.dart';
 import 'package:accountable/extensions/StandardColor.dart';
 import 'package:accountable/model/MoneyAccount.dart';
+import 'package:accountable/model/StandardColor.dart';
 import 'package:accountable/model/TransactionRecord.dart';
 import 'package:accountable/pages/CreateTransaction.dart';
 import 'package:accountable/utilities/LoadingScreen.dart';
@@ -10,9 +11,9 @@ import 'package:intl/intl.dart';
 
 /// A page that displays an account's data
 class ViewAccountPage extends StatefulWidget {
-  ViewAccountPage(this.accountId, {Key? key}) : super(key: key);
+  ViewAccountPage(this.account, {Key? key}) : super(key: key);
 
-  final String accountId;
+  final MoneyAccount account;
 
   @override
   _ViewAccountPageState createState() => _ViewAccountPageState();
@@ -20,7 +21,8 @@ class ViewAccountPage extends StatefulWidget {
 
 class _ViewAccountPageState extends State<ViewAccountPage> {
   GlobalKey<RefreshIndicatorState> refreshKey = GlobalKey();
-  MoneyAccount? account;
+  late String accountTitle;
+  late StandardColor accountColor;
   VoidCallback? unsubscribeAccount;
   List<TransactionRecord>? loadedTransactions;
   VoidCallback? unsubscribeTransactions;
@@ -28,6 +30,8 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
   @override
   initState() {
     super.initState();
+    this.accountTitle = this.widget.account.title;
+    this.accountColor = this.widget.account.color;
     refreshList();
   }
 
@@ -51,22 +55,31 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
   Future<void> refreshList() async {
     setState(() {
       this.loadedTransactions = null;
-      this.account = null;
     });
 
     this.stopListening();
     unsubscribeAccount = await watchMoneyAccountWithId(
-      this.widget.accountId,
+      this.widget.account.id,
       (MoneyAccount? account) {
+        debugPrint("Received account change.");
+        if (account == null) {
+          return;
+        }
         setState(() {
-          this.account = account;
+          if (this.accountTitle != account.title) {
+            this.accountTitle = account.title;
+          }
+          if (this.accountColor != account.color) {
+            this.accountColor = account.color;
+          }
         });
       },
     );
-    unsubscribeTransactions = watchTransactionsForAccountWithId(
-      this.widget.accountId,
+    unsubscribeTransactions = await watchTransactionsForAccount(
+      this.widget.account,
       (transactions) {
         List<TransactionRecord> sorted = transactions.values.toList();
+        debugPrint("Fetched transactions. Got ${sorted.length} of them.");
         sorted.sort((a, b) => b.createdAt.compareTo(b.createdAt));
         setState(() {
           this.loadedTransactions = sorted;
@@ -76,14 +89,10 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
   }
 
   Future<dynamic> displayDialog(BuildContext context) async {
-    if (this.account == null) {
-      return;
-    }
-
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) =>
-            new CreateTransactionPage(this.account!, createTransactionRecord),
+        builder: (_) => new CreateTransactionPage(
+            this.widget.account, createTransactionRecord),
       ),
     );
   }
@@ -153,11 +162,11 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
     return Theme(
       data: ThemeData(
         brightness: Theme.of(context).brightness,
-        primarySwatch: this.account?.color.materialColor ?? Colors.green,
+        primarySwatch: this.accountColor.materialColor,
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(this.account?.title ?? "Loading Account..."),
+          title: Text(this.accountTitle),
           actions: <Widget>[
             IconButton(
               icon: const Icon(Icons.info_outline),
@@ -168,7 +177,7 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
         body: RefreshIndicator(
           key: refreshKey,
           onRefresh: refreshList,
-          child: this.account == null || this.loadedTransactions == null
+          child: this.loadedTransactions == null
               ? loadingState()
               : this.loadedTransactions?.isEmpty == true
                   ? emptyState()
