@@ -15,6 +15,7 @@ class LoginOrRegister extends StatefulWidget {
   final Future<void> Function({
     required Keys keys,
     required String url,
+    required String liveQueryUrl,
     required String username,
     required String password,
   }) tryLogin;
@@ -22,6 +23,7 @@ class LoginOrRegister extends StatefulWidget {
   final Future<void> Function({
     required Keys keys,
     required String url,
+    required String liveQueryUrl,
     required String email,
     required String username,
     required String password,
@@ -34,9 +36,11 @@ class LoginOrRegister extends StatefulWidget {
 class _LoginState extends State<LoginOrRegister> {
   final String parseServerUrl =
       "https://accountable.b4a.io"; // "https://parseapi.back4app.com";
+  final String parseWebsocketUrl = "wss://accountable.b4a.io";
 
   final GlobalKey<FormState> _formKey = GlobalKey();
   final TextEditingController _urlController = TextEditingController();
+  final TextEditingController _websocketUrlController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -52,6 +56,7 @@ class _LoginState extends State<LoginOrRegister> {
   @override
   void initState() {
     _urlController.text = parseServerUrl;
+    _websocketUrlController.text = parseWebsocketUrl;
     super.initState();
   }
 
@@ -93,6 +98,9 @@ class _LoginState extends State<LoginOrRegister> {
     final String url = _urlController.text.trim().isNotEmpty
         ? _urlController.text.trim()
         : parseServerUrl;
+    final String liveQueryUrl = _websocketUrlController.text.trim().isNotEmpty
+        ? _websocketUrlController.text.trim()
+        : parseServerUrl;
     final String email = _emailController.text.trim();
     final String username = _usernameController.text.trim();
     final String password = _passwordController.text;
@@ -102,6 +110,7 @@ class _LoginState extends State<LoginOrRegister> {
         await widget.tryRegister(
           keys: widget.keys,
           url: url,
+          liveQueryUrl: liveQueryUrl,
           email: email,
           username: username,
           password: password,
@@ -110,6 +119,7 @@ class _LoginState extends State<LoginOrRegister> {
         await widget.tryLogin(
           keys: widget.keys,
           url: url,
+          liveQueryUrl: liveQueryUrl,
           username: username,
           password: password,
         );
@@ -145,6 +155,23 @@ class _LoginState extends State<LoginOrRegister> {
         ),
         labelText: "Server URL",
         hintText: parseServerUrl,
+      ),
+    );
+  }
+
+  Widget websocketUrlField(FocusScopeNode node) {
+    return TextFormField(
+      controller: _websocketUrlController,
+      onChanged: checkCanCommitLogin,
+      keyboardType: TextInputType.url,
+      textCapitalization: TextCapitalization.none,
+      autocorrect: false,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.black),
+        ),
+        labelText: "Websocket URL (for live updates)",
+        hintText: parseWebsocketUrl,
       ),
     );
   }
@@ -326,6 +353,7 @@ class _LoginState extends State<LoginOrRegister> {
                 // Advanced
                 advancedToggleButton(),
                 if (showsAdvancedOptions) urlField(node),
+                if (showsAdvancedOptions) websocketUrlField(node),
 
                 // Buttons
                 submitButton(),

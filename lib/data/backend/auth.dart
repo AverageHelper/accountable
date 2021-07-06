@@ -25,17 +25,14 @@ VoidCallback watchAuthState(Function(bool) cb) {
 Future<void> logIn({
   required Keys keys,
   required String url,
+  required String liveQueryUrl,
   required String username,
   required String password,
 }) async {
-  final String defaultUrl =
-      "https://accountable.b4a.io"; // "https://parseapi.back4app.com";
-
   await Parse().initialize(
     keys.appId,
     url,
-    // FIXME: This may cause issues
-    liveQueryUrl: url == defaultUrl ? "wss://accountable.b4a.io" : null,
+    liveQueryUrl: liveQueryUrl,
     clientKey: keys.clientKey,
     autoSendSessionId: true,
   );
@@ -55,6 +52,7 @@ Future<void> logIn({
 Future<void> registerUser({
   required Keys keys,
   required String url,
+  required String liveQueryUrl,
   required String email,
   required String username,
   required String password,
@@ -66,6 +64,7 @@ Future<void> registerUser({
     return logIn(
       keys: keys,
       url: url,
+      liveQueryUrl: liveQueryUrl,
       username: username,
       password: password,
     );
