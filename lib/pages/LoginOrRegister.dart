@@ -1,3 +1,4 @@
+import 'package:accountable/data/backend/auth.dart';
 import 'package:accountable/model/Keys.dart';
 import 'package:flutter/material.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk.dart';
@@ -12,22 +13,16 @@ class LoginOrRegister extends StatefulWidget {
 
   final Keys keys;
 
-  final Future<void> Function({
-    required Keys keys,
-    required String url,
-    required String liveQueryUrl,
-    required String username,
-    required String password,
-  }) tryLogin;
+  final Future<void> Function(
+    Keys keys,
+    LoginInfo info,
+  ) tryLogin;
 
-  final Future<void> Function({
-    required Keys keys,
-    required String url,
-    required String liveQueryUrl,
-    required String email,
-    required String username,
-    required String password,
-  }) tryRegister;
+  final Future<void> Function(
+    Keys keys,
+    LoginInfo info,
+    String email,
+  ) tryRegister;
 
   @override
   _LoginState createState() => _LoginState();
@@ -108,21 +103,23 @@ class _LoginState extends State<LoginOrRegister> {
     try {
       if (isRegisteringNewAccount) {
         await widget.tryRegister(
-          keys: widget.keys,
-          url: url,
-          liveQueryUrl: liveQueryUrl,
-          email: email,
-          username: username,
-          password: password,
-        );
+            widget.keys,
+            new LoginInfo(
+              url,
+              liveQueryUrl,
+              username,
+              password,
+            ),
+            email);
       } else {
         await widget.tryLogin(
-          keys: widget.keys,
-          url: url,
-          liveQueryUrl: liveQueryUrl,
-          username: username,
-          password: password,
-        );
+            widget.keys,
+            new LoginInfo(
+              url,
+              liveQueryUrl,
+              username,
+              password,
+            ));
       }
     } catch (e, stackTrace) {
       debugPrint("${e.runtimeType.toString()}: ${e.toString()}\n$stackTrace");

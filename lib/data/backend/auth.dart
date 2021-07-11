@@ -1,3 +1,4 @@
+import 'package:accountable/data/secureStorage.dart';
 import 'package:accountable/model/Keys.dart';
 import 'package:flutter/material.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk.dart';
@@ -8,6 +9,15 @@ ParseUser? loggedInUser;
 
 ParseUser? currentUser() {
   return loggedInUser;
+}
+
+class LoginInfo {
+  final String url;
+  final String liveQueryUrl;
+  final String username;
+  final String password;
+
+  LoginInfo(this.url, this.liveQueryUrl, this.username, this.password);
 }
 
 /// Monitors the current login state and calls a callback
@@ -22,23 +32,31 @@ VoidCallback watchAuthState(Function(bool) cb) {
   };
 }
 
-Future<void> logIn({
-  required Keys keys,
-  required String url,
-  required String liveQueryUrl,
-  required String username,
-  required String password,
-}) async {
+Future<void> logOut() async {
+  await loggedInUser?.logout();
+  loggedInUser = null;
+  await clearLastLogin();
+  authStateListeners.forEach((cb) => cb(false));
+}
+
+Future<void> logIn(
+  final Keys keys,
+  final LoginInfo info,
+) async {
+  if (loggedInUser != null) {
+    throw "Already logged in";
+  }
   await Parse().initialize(
     keys.appId,
-    url,
-    liveQueryUrl: liveQueryUrl,
+    info.url,
+    liveQueryUrl: info.liveQueryUrl,
     clientKey: keys.clientKey,
     autoSendSessionId: true,
   );
 
-  final user = ParseUser(username, password, null);
+  final user = ParseUser(info.username, info.password, null);
   final response = await user.login();
+  await setLastLogin(info);
 
   if (response.success) {
     loggedInUser = user;
@@ -49,25 +67,16 @@ Future<void> logIn({
   throw response.error!;
 }
 
-Future<void> registerUser({
-  required Keys keys,
-  required String url,
-  required String liveQueryUrl,
-  required String email,
-  required String username,
-  required String password,
-}) async {
-  final user = ParseUser(username, password, email);
+Future<void> registerUser(
+  final Keys keys,
+  final LoginInfo info,
+  final String email,
+) async {
+  final user = ParseUser(info.username, info.password, email);
   ParseResponse response = await user.create();
 
   if (response.success) {
-    return logIn(
-      keys: keys,
-      url: url,
-      liveQueryUrl: liveQueryUrl,
-      username: username,
-      password: password,
-    );
+    return logIn(keys, info);
   }
 
   throw response.error!;

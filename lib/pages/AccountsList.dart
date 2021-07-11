@@ -1,3 +1,4 @@
+import 'package:accountable/data/backend/auth.dart';
 import 'package:accountable/data/moneyAccounts.dart';
 import 'package:accountable/extensions/StandardColor.dart';
 import 'package:accountable/model/MoneyAccount.dart';
@@ -121,12 +122,29 @@ class _AccountsListPageState extends State<AccountsList> {
     );
   }
 
+  Widget drawer(BuildContext context) {
+    return new Drawer(
+      child: ListView(
+        children: <Widget>[
+          DrawerHeader(
+            child: Text("Accountable"),
+          ),
+          ListTile(
+            title: Text("Log Out"),
+            onTap: logOut,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Accounts"),
       ),
+      drawer: drawer(context),
       body: RefreshIndicator(
         key: refreshKey,
         onRefresh: refreshList,

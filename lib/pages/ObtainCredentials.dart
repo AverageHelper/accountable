@@ -1,3 +1,4 @@
+import 'package:accountable/data/secureStorage.dart';
 import 'package:accountable/model/Keys.dart';
 import 'package:accountable/data/backend/auth.dart';
 import 'package:accountable/pages/AccountsList.dart';
@@ -11,17 +12,33 @@ class ObtainCredentials extends StatefulWidget {
   final Keys keys;
 
   @override
-  _LoginOrRegisterState createState() => _LoginOrRegisterState();
+  _ObtainCredentialsState createState() => _ObtainCredentialsState();
 }
 
-class _LoginOrRegisterState extends State<ObtainCredentials> {
+class _ObtainCredentialsState extends State<ObtainCredentials> {
   VoidCallback? unsubscribeLogin;
   bool? isLoggedIn;
 
   @override
   initState() {
     super.initState();
+    this._setup();
+  }
+
+  _setup() async {
+    // Try login first
+    LoginInfo? lastLogin = await getLastLogin();
+    if (lastLogin != null) {
+      try {
+        await logIn(widget.keys, lastLogin);
+      } catch (e, stackTrace) {
+        debugPrint("${e.runtimeType.toString()}: ${e.toString()}\n$stackTrace");
+        await clearLastLogin();
+      }
+    }
+
     unsubscribeLogin = watchAuthState((isLoggedIn) {
+      debugPrint("[ObtainCredentials] New login state: $isLoggedIn");
       setState(() {
         this.isLoggedIn = isLoggedIn;
       });
