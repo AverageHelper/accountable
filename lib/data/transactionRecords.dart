@@ -139,3 +139,8 @@ Future<TransactionRecord> createTransactionRecord({
 
   return newRecord;
 }
+
+Future<void> deleteTransaction(final TransactionRecord transaction) async {
+  await transaction.serialized().delete();
+  // loadedTransactionsForAccounts[transaction.account]?.remove(transaction.id);
+}

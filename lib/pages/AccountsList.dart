@@ -17,8 +17,13 @@ class AccountsList extends StatefulWidget {
 
 class _AccountsListPageState extends State<AccountsList> {
   GlobalKey<RefreshIndicatorState> refreshKey = GlobalKey();
+  Set<MoneyAccount> selectedAccounts = new Set();
   List<MoneyAccount>? loadedAccounts;
   VoidCallback? unsubscribeAccounts;
+
+  bool get isEditing {
+    return this.selectedAccounts.isNotEmpty;
+  }
 
   @override
   initState() {
@@ -30,6 +35,26 @@ class _AccountsListPageState extends State<AccountsList> {
   dispose() {
     this.stopListening();
     super.dispose();
+  }
+
+  selectAccount(final MoneyAccount account) {
+    setState(() {
+      selectedAccounts.add(account);
+    });
+  }
+
+  deselectAccount(final MoneyAccount account) {
+    setState(() {
+      selectedAccounts.remove(account);
+    });
+  }
+
+  toggleAccountSelection(final MoneyAccount account) {
+    if (selectedAccounts.contains(account)) {
+      deselectAccount(account);
+    } else {
+      selectAccount(account);
+    }
   }
 
   void stopListening() {
@@ -52,6 +77,37 @@ class _AccountsListPageState extends State<AccountsList> {
         this.loadedAccounts = sorted;
       });
     });
+  }
+
+  void presentDeletionDialog() {
+    if (selectedAccounts.isEmpty) return;
+
+    final String title = selectedAccounts.length == 1
+        ? "Delete '${selectedAccounts.first.title}'?"
+        : "Delete ${selectedAccounts.length} accounts?";
+    final String message = "All associated transactions will also be deleted.";
+
+    showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+              title: Text(title),
+              content: Text(message),
+              actions: <Widget>[
+                TextButton(
+                  child: Text("Cancel"),
+                  onPressed: () async {
+                    await Future.forEach(selectedAccounts, deleteMoneyAccount);
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ));
   }
 
   Future<void> onFinishedCreatingAccount({
@@ -89,14 +145,29 @@ class _AccountsListPageState extends State<AccountsList> {
   }
 
   Widget moneyListItem(MoneyAccount account) {
-    return ListTile(
+    return new ListTile(
       title: Text(account.title),
       subtitle: account.notes != null ? Text(account.notes!) : null,
       leading: Icon(
         Icons.circle,
         color: account.color.primaryColor,
       ),
-      onTap: () => displayAccountDetails(account),
+      selected: selectedAccounts.contains(account),
+      selectedTileColor: Colors.grey.withOpacity(0.3),
+      onTap: () {
+        if (isEditing) {
+          toggleAccountSelection(account);
+        } else {
+          displayAccountDetails(account);
+        }
+      },
+      onLongPress: () {
+        if (isEditing) {
+          toggleAccountSelection(account);
+        } else {
+          selectAccount(account);
+        }
+      },
     );
   }
 
@@ -125,12 +196,12 @@ class _AccountsListPageState extends State<AccountsList> {
   Widget drawer(BuildContext context) {
     return new Drawer(
       child: ListView(
-        children: <Widget>[
+        children: const <Widget>[
           DrawerHeader(
-            child: Text("Accountable"),
+            child: const Text("Accountable"),
           ),
           ListTile(
-            title: Text("Log Out"),
+            title: const Text("Log Out"),
             onTap: logOut,
           ),
         ],
@@ -138,13 +209,26 @@ class _AccountsListPageState extends State<AccountsList> {
     );
   }
 
+  List<Widget> appBarActions() {
+    if (!isEditing) {
+      return <Widget>[];
+    }
+    return <Widget>[
+      IconButton(
+        onPressed: presentDeletionDialog,
+        icon: Icon(Icons.delete),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Accounts"),
+        actions: appBarActions(),
       ),
-      drawer: drawer(context),
+      drawer: !isEditing ? drawer(context) : null,
       body: RefreshIndicator(
         key: refreshKey,
         onRefresh: refreshList,

@@ -1,4 +1,5 @@
 import 'package:accountable/data/backend/auth.dart';
+import 'package:accountable/data/transactionRecords.dart';
 import 'package:accountable/model/MoneyAccount.dart';
 import 'package:accountable/data/backend/MoneyAccountObject.dart';
 import 'package:accountable/model/StandardColor.dart';
@@ -178,4 +179,11 @@ Future<MoneyAccount> createMoneyAccount({
   newAccount = newAccount.withId(objectId);
 
   return newAccount;
+}
+
+Future<void> deleteMoneyAccount(final MoneyAccount account) async {
+  final transactions = await getTransactionsForMoneyAccount(account);
+  await Future.forEach(transactions.values, deleteTransaction);
+  await account.serialized().delete();
+  // loadedAccounts.remove(account.id);
 }
