@@ -2,7 +2,8 @@
     package="io.github.averagehelper.accountable">
    <application
         android:label="Accountable"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
