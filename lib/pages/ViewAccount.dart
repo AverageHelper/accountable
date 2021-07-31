@@ -4,22 +4,22 @@ import 'package:accountable/extensions/StandardColor.dart';
 import 'package:accountable/model/MoneyAccount.dart';
 import 'package:accountable/model/StandardColor.dart';
 import 'package:accountable/model/TransactionRecord.dart';
-import 'package:accountable/pages/CreateTransaction.dart';
+import 'package:accountable/pages/EditTransaction.dart';
 import 'package:accountable/utilities/LoadingScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 /// A page that displays an account's data
-class ViewAccountPage extends StatefulWidget {
-  ViewAccountPage(this.account, {Key? key}) : super(key: key);
+class ViewAccount extends StatefulWidget {
+  ViewAccount(this.account, {Key? key}) : super(key: key);
 
   final MoneyAccount account;
 
   @override
-  _ViewAccountPageState createState() => _ViewAccountPageState();
+  _ViewAccountState createState() => _ViewAccountState();
 }
 
-class _ViewAccountPageState extends State<ViewAccountPage> {
+class _ViewAccountState extends State<ViewAccount> {
   GlobalKey<RefreshIndicatorState> refreshKey = GlobalKey();
   late String accountTitle;
   late StandardColor accountColor;
@@ -91,19 +91,19 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
   Future<dynamic> displayDialog(BuildContext context) async {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => new CreateTransactionPage(
-            this.widget.account, createTransactionRecord),
+        builder: (_) => new EditTransaction(
+            this.widget.account, null, editTransactionRecord),
       ),
     );
   }
 
-  void displayTransactionDetails(String transactionId) {
-    // TODO: Navigate to this transaction's page
-    // Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (_) => new ViewTransactionPage(transactionId),
-    //   ),
-    // );
+  void displayTransactionDetails(TransactionRecord transaction) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => new EditTransaction(
+            this.widget.account, transaction, editTransactionRecord),
+      ),
+    );
   }
 
   Widget transactionListItem(TransactionRecord transaction) {
@@ -131,7 +131,7 @@ class _ViewAccountPageState extends State<ViewAccountPage> {
             ? null // default
             : const TextStyle(color: Colors.red),
       ),
-      onTap: () => displayTransactionDetails(transaction.id),
+      onTap: () => displayTransactionDetails(transaction),
     );
   }
 

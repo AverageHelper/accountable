@@ -8,14 +8,14 @@ import 'package:accountable/pages/ViewAccount.dart';
 import 'package:accountable/utilities/LoadingScreen.dart';
 import 'package:flutter/material.dart';
 
-class AccountsList extends StatefulWidget {
-  AccountsList({Key? key}) : super(key: key);
+class ListAccounts extends StatefulWidget {
+  ListAccounts({Key? key}) : super(key: key);
 
   @override
-  _AccountsListPageState createState() => _AccountsListPageState();
+  _ListAccountsPageState createState() => _ListAccountsPageState();
 }
 
-class _AccountsListPageState extends State<AccountsList> {
+class _ListAccountsPageState extends State<ListAccounts> {
   GlobalKey<RefreshIndicatorState> refreshKey = GlobalKey();
   Set<MoneyAccount> selectedAccounts = new Set();
   List<MoneyAccount>? loadedAccounts;
@@ -139,12 +139,12 @@ class _AccountsListPageState extends State<AccountsList> {
     // Navigate to this account's page
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => new ViewAccountPage(account),
+        builder: (_) => new ViewAccount(account),
       ),
     );
   }
 
-  Widget moneyListItem(MoneyAccount account) {
+  Widget accountListItem(MoneyAccount account) {
     return new ListTile(
       title: Text(account.title),
       subtitle: account.notes != null ? Text(account.notes!) : null,
@@ -239,7 +239,7 @@ class _AccountsListPageState extends State<AccountsList> {
                 : ListView.builder(
                     itemCount: this.loadedAccounts!.length,
                     itemBuilder: (_, idx) =>
-                        moneyListItem(this.loadedAccounts![idx]),
+                        accountListItem(this.loadedAccounts![idx]),
                   ),
       ),
       floatingActionButton: this.loadedAccounts == null
@@ -247,7 +247,7 @@ class _AccountsListPageState extends State<AccountsList> {
           : FloatingActionButton(
               onPressed: () => displayDialog(context),
               tooltip: 'Add an Account',
-              child: const Icon(Icons.add),
+              child: const Icon(Icons.attach_money),
             ),
     );
   }

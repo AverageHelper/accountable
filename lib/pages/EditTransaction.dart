@@ -2,6 +2,7 @@ import 'package:accountable/extensions/StandardColor.dart';
 import 'package:accountable/extensions/String.dart';
 import 'package:accountable/model/MoneyAccount.dart';
 import 'package:accountable/model/StandardColor.dart';
+import 'package:accountable/model/TransactionRecord.dart';
 import 'package:accountable/utilities/AlwaysDisabledFocusNode.dart';
 import 'package:accountable/utilities/CheckboxFormField.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
@@ -10,16 +11,20 @@ import 'package:intl/intl.dart';
 import 'package:money2/money2.dart';
 
 /// A page that requests metadata about a new transaction.
-class CreateTransactionPage extends StatefulWidget {
-  CreateTransactionPage(this.account, this.onFinished, {Key? key})
+class EditTransaction extends StatefulWidget {
+  EditTransaction(this.account, this.transaction, this.onFinished, {Key? key})
       : super(key: key);
 
   /// The account which owns the transaction.
   final MoneyAccount account;
 
-  /// A function that `CreateTransactionPage` calls when the user commits the form.
+  /// The transaction to edit.
+  final TransactionRecord? transaction;
+
+  /// A function that `EditTransaction` calls when the user commits the form.
   final void Function({
     required MoneyAccount account,
+    required String? existingTransactionId,
     required String title,
     required String notes,
     required bool isReconciled,
@@ -28,7 +33,7 @@ class CreateTransactionPage extends StatefulWidget {
   }) onFinished;
 
   @override
-  _CreateTransactionPageState createState() => _CreateTransactionPageState();
+  _EditTransactionState createState() => _EditTransactionState();
 }
 
 Widget colorDropdownItem(StandardColor color) {
@@ -48,7 +53,7 @@ Widget colorDropdownItem(StandardColor color) {
   );
 }
 
-class _CreateTransactionPageState extends State<CreateTransactionPage> {
+class _EditTransactionState extends State<EditTransaction> {
   final GlobalKey<FormState> _formKey = GlobalKey();
   final TextEditingController _nameFieldController = TextEditingController();
   final TextEditingController _notesFieldController = TextEditingController();
@@ -56,6 +61,19 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
   DateTime _transactionTime = DateTime.now();
   Currency _currency = Currency.create('USD', 2);
   late Money _amountEarned = Money.from(-0, _currency);
+
+  @override
+  initState() {
+    super.initState();
+    final transaction = this.widget.transaction;
+    this._nameFieldController.text = transaction?.title ?? "";
+    this._notesFieldController.text = transaction?.notes ?? "";
+    this._isReconciled = transaction?.isReconciled ?? this._isReconciled;
+    this._transactionTime = transaction?.createdAt ?? this._transactionTime;
+    this._currency = transaction?.amountEarned.currency ?? this._currency;
+    this._amountEarned =
+        transaction?.amountEarned ?? Money.from(-0, this._currency);
+  }
 
   bool get _isIncome {
     return this._amountEarned.isPositive;
@@ -76,6 +94,7 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
   void _commitForm() {
     this.widget.onFinished(
           account: this.widget.account,
+          existingTransactionId: this.widget.transaction?.id,
           title: this._nameFieldController.text,
           notes: this._notesFieldController.text,
           isReconciled: this._isReconciled,
@@ -108,7 +127,14 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
   void _checkCanCommitAccount() {
     setState(() {
       // validate parameters
-      this._canCommitTransaction = _nameFieldController.text.isNotEmpty;
+      final originalTransaction = this.widget.transaction;
+      this._canCommitTransaction = this._nameFieldController.text.isNotEmpty &&
+          (this._nameFieldController.text != originalTransaction?.title ||
+              this._notesFieldController.text != originalTransaction?.notes ||
+              this._isReconciled != originalTransaction?.isReconciled ||
+              this._transactionTime != originalTransaction?.createdAt ||
+              this._amountEarned.minorUnits !=
+                  originalTransaction?.amountEarned.minorUnits);
     });
   }
 
@@ -152,7 +178,8 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
       ),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Add a transaction"),
+          title: Text(
+              "${this.widget.transaction == null ? 'Add' : 'Edit'} a transaction"),
           leading: IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {
@@ -205,6 +232,7 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
 
                 // Amount
                 TextFormField(
+                  initialValue: this._amountEarned.toString(),
                   onChanged: _onAmountFieldChanged,
                   inputFormatters: [
                     CurrencyTextInputFormatter(
@@ -213,8 +241,10 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
                     )
                   ],
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    hintText: "\$0.00",
+                  decoration: InputDecoration(
+                    hintText:
+                        this.widget.transaction?.amountEarned.toString() ??
+                            "\$0.00",
                     icon: const Icon(Icons.attach_money),
                   ),
                 ),

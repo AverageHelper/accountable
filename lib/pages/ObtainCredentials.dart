@@ -1,7 +1,7 @@
 import 'package:accountable/data/secureStorage.dart';
 import 'package:accountable/model/Keys.dart';
 import 'package:accountable/data/backend/auth.dart';
-import 'package:accountable/pages/AccountsList.dart';
+import 'package:accountable/pages/ListAccounts.dart';
 import 'package:accountable/pages/LoginOrRegister.dart';
 import 'package:accountable/utilities/LoadingScreen.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +68,6 @@ class _ObtainCredentialsState extends State<ObtainCredentials> {
       );
     }
 
-    return AccountsList();
+    return ListAccounts();
   }
 }
